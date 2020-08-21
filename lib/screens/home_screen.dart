@@ -1,3 +1,6 @@
+import 'dart:convert';
+import 'dart:typed_data';
+
 import 'package:flutter/material.dart';
 import 'package:little_tarot_journal/components/tarot_container.dart';
 
@@ -33,5 +36,15 @@ class _HomeScreenState extends State<HomeScreen> {
         ),
       ],
     );
+  }
+
+  List<int> _selectedFile;
+  Uint8List _bytesData;
+
+  void _handleResult(Object result) {
+    setState(() {
+      _bytesData = Base64Decoder().convert(result.toString().split(",").last);
+      _selectedFile = _bytesData;
+    });
   }
 }
