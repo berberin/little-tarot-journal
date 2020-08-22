@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
+import 'package:little_tarot_journal/components/dropzone.dart';
 import 'package:little_tarot_journal/components/tarot_container.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -13,25 +14,35 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
-    return Flex(
-      direction: Axis.horizontal,
+    return Column(
       children: [
         Expanded(
           flex: 1,
-          child: Container(
-            color: Colors.red,
-          ),
+          child: Dropzone(),
         ),
         Expanded(
-          flex: 1,
-          child: Container(
-            child: TarotImageContainer(),
-          ),
-        ),
-        Expanded(
-          flex: 1,
-          child: Container(
-            color: Colors.blue,
+          flex: 4,
+          child: Row(
+            children: [
+              Expanded(
+                flex: 1,
+                child: Container(
+                  color: Colors.red,
+                ),
+              ),
+              Expanded(
+                flex: 1,
+                child: Container(
+                  child: TarotImageContainer(),
+                ),
+              ),
+              Expanded(
+                flex: 1,
+                child: Container(
+                  color: Colors.blue,
+                ),
+              ),
+            ],
           ),
         ),
       ],
