@@ -19,7 +19,18 @@ class _DropzoneState extends State<Dropzone> {
         padding: EdgeInsets.all(0),
         child: Container(
           child: Center(
-            child: Column(),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  dropUsage,
+                  style: TextStyle(
+                    fontSize: 30,
+                  ),
+                  textAlign: TextAlign.center,
+                )
+              ],
+            ),
           ),
         ),
       ),
