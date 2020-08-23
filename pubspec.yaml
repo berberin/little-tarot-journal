@@ -29,6 +29,9 @@ dependencies:
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^0.1.3
   dotted_border: ^1.0.6
+  flutter_html: ^0.8.2
+  flutter_dropzone: ^1.0.9
+  matrix4_transform: ^1.1.4
 
 dev_dependencies:
   flutter_test:
@@ -51,6 +54,11 @@ flutter:
   #   - images/a_dot_ham.jpeg
   assets:
     - assets/images/
+
+  fonts:
+    - family: Quicksand
+      fonts:
+        - asset: fonts/Quicksand-Medium.ttf
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware.

@@ -2,6 +2,11 @@ import 'package:dotted_border/dotted_border.dart';
 import 'package:flutter/material.dart';
 import 'package:little_tarot_journal/constants.dart';
 
+enum DragState {
+  dragging,
+  notDragging,
+}
+
 class Dropzone extends StatefulWidget {
   @override
   _DropzoneState createState() => _DropzoneState();
@@ -19,7 +24,18 @@ class _DropzoneState extends State<Dropzone> {
         padding: EdgeInsets.all(0),
         child: Container(
           child: Center(
-            child: Column(),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  dropUsage,
+                  style: TextStyle(
+                    fontSize: 30,
+                  ),
+                  textAlign: TextAlign.center,
+                )
+              ],
+            ),
           ),
         ),
       ),
