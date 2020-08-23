@@ -14,11 +14,20 @@ class TarotInfo {
   String question;
   String datetime;
   String note;
-
-  TarotInfo({this.name, this.question, this.datetime, this.note});
+  bool reverse;
+  TarotInfo({this.name, this.question, this.datetime, this.note, this.reverse});
 }
 
-List<Tarot> cards = [
+Tarot getCardFromName(String cardName) {
+  for (var card in tarotCards) {
+    if (card.name == cardName) {
+      return card;
+    }
+  }
+  return null;
+}
+
+List<Tarot> tarotCards = [
   Tarot(
       name: "The Fool",
       image: "the-fool.jpg",
