@@ -10,12 +10,12 @@ class Tarot {
 }
 
 class TarotInfo {
-  String name;
+  int index;
   String question;
   String datetime;
   String note;
   bool reverse;
-  TarotInfo({this.name, this.question, this.datetime, this.note, this.reverse});
+  TarotInfo({this.index, this.question, this.datetime, this.note, this.reverse});
 }
 
 Tarot getCardFromName(String cardName) {
