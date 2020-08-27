@@ -1,5 +1,8 @@
 import 'dart:math';
+import 'dart:typed_data';
 
+import 'package:arweave/arweave.dart';
+import 'package:arweave/utils.dart';
 import 'package:dotted_border/dotted_border.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dropzone/flutter_dropzone.dart';
@@ -33,6 +36,10 @@ class _HomeScreenState extends State<HomeScreen> {
 
   TextEditingController questionController;
   TextEditingController noteController;
+
+  Wallet wallet;
+  Arweave client = Arweave();
+  var balance;
 
   var random = Random();
 
@@ -216,7 +223,8 @@ class _HomeScreenState extends State<HomeScreen> {
                                 child: TextFormField(
                                   maxLines: 8,
                                   decoration: InputDecoration(
-                                    labelText: "Your note about this reading",
+                                    hintText: "Your note about this reading",
+                                    labelText: "Note",
                                     border: OutlineInputBorder(
                                       borderRadius: BorderRadius.circular(17),
                                     ),
@@ -338,7 +346,10 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
           onTap: () async {
             dynamic ev = await controller.pickFiles(multiple: false);
-            print(String.fromCharCodes(await controller.getFileData(ev[0])));
+            Uint8List data = await controller.getFileData(ev[0]);
+            logged = await Authenticator.login(data);
+            balance = await client.wallets.getBalance(Authenticator.address);
+            setState(() {});
           },
         ),
       ],
@@ -346,7 +357,14 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Widget _futureBuilderListCard() {
-    return Container();
+    return Container(
+      child: Column(
+        children: [
+          Text(Authenticator.address),
+          Text(winstonToAr(BigInt.parse(balance))),
+        ],
+      ),
+    );
   }
 
   Widget _startDrawCardWidget() {
@@ -378,7 +396,8 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
                 child: TextFormField(
                   decoration: InputDecoration(
-                    labelText: "Write out your question (optional)",
+                    hintText: "Write out your question (optional)",
+                    labelText: "Your question",
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(17),
                     ),
@@ -392,7 +411,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 height: 90,
               ),
               raisedButton(
-                title: "DRAW A TAROT CARD",
+                title: "DRAW A CARD",
                 fontSize: 20,
                 fontWeight: FontWeight.w600,
                 color: pastelBlue,

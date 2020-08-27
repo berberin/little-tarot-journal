@@ -34,7 +34,6 @@ dependencies:
   matrix4_transform: ^1.1.4
   intl: ^0.16.1
   jose: ^0.2.1
-  encrypt: ^4.0.2
   arweave:
     git:
       url: https://github.com/CDDelta/arweave-dart.git
@@ -45,6 +44,9 @@ dependency_overrides:
     git:
       url: https://github.com/bcgit/pc-dart.git
       ref: 52e6c64b5b511fb54c7baba271ce8b3efb5289bf
+  crypto_keys:
+    git:
+      url: https://github.com/berberin/crypto_keys.git
 
 
 dev_dependencies:

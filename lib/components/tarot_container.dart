@@ -4,8 +4,8 @@ import 'package:matrix4_transform/matrix4_transform.dart';
 class TarotImageContainer extends StatelessWidget {
   final String asset;
   final bool reverse;
-
-  TarotImageContainer({this.asset, this.reverse: false});
+  final bool inTarotBoard;
+  TarotImageContainer({this.asset, this.reverse: false, this.inTarotBoard: false});
 
   @override
   Widget build(BuildContext context) {
