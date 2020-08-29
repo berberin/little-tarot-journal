@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 class Tarot {
   String name;
   String image;
@@ -16,6 +18,25 @@ class TarotInfo {
   String note;
   bool reverse;
   TarotInfo({this.index, this.question, this.datetime, this.note, this.reverse});
+
+  TarotInfo.fromJson(Map<String, dynamic> mapJson) {
+    index = mapJson["index"];
+    reverse = mapJson["reverse"];
+    question = mapJson["question"];
+    datetime = mapJson["datetime"];
+    note = mapJson["note"];
+  }
+
+  String toJson() {
+    Map<String, dynamic> mapJson = Map<String, dynamic>();
+    mapJson["index"] = index;
+    mapJson["reverse"] = reverse;
+    mapJson["question"] = question;
+    mapJson["datetime"] = datetime;
+    mapJson["note"] = note;
+    String s = json.encode(mapJson);
+    return s;
+  }
 }
 
 Tarot getCardFromName(String cardName) {

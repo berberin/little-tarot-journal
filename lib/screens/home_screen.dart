@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:math';
 import 'dart:typed_data';
 
@@ -243,7 +244,9 @@ class _HomeScreenState extends State<HomeScreen> {
                                       color: pastelGreen,
                                       fontSize: 20,
                                       fontWeight: FontWeight.w600,
-                                      onPressed: () {},
+                                      onPressed: () async {
+                                        await _saveYourJournal();
+                                      },
                                     )
                                   : Container(),
                               SizedBox(
@@ -295,6 +298,7 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   _setDemoCurrentInfoCard() {
+    //fixme:
     enableEdit = false;
     currentTarotInfo = TarotInfo(
       index: 1,
@@ -418,7 +422,6 @@ class _HomeScreenState extends State<HomeScreen> {
                 onPressed: () {
                   enableEdit = true;
                   question = questionController.text;
-                  print(question);
                   _drawCard();
                 },
               ),
@@ -447,5 +450,12 @@ class _HomeScreenState extends State<HomeScreen> {
       color: color,
       onPressed: () => onPressed(),
     );
+  }
+
+  _saveYourJournal() async {
+    currentTarotInfo.note = noteController.text;
+    String journal = currentTarotInfo.toJson();
+    Uint8List journalEncryted = Authenticator.encrypt(utf8.encode(journal));
+    // send journal to Arweave
   }
 }
