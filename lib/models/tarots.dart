@@ -17,7 +17,7 @@ class TarotInfo {
   String datetime;
   String note;
   bool reverse;
-  TarotInfo({this.index, this.question, this.datetime, this.note, this.reverse});
+  TarotInfo({this.index, this.question, this.datetime, this.note, this.reverse: false});
 
   TarotInfo.fromJson(Map<String, dynamic> mapJson) {
     index = mapJson["index"];
@@ -46,6 +46,14 @@ Tarot getCardFromName(String cardName) {
     }
   }
   return null;
+}
+
+String getAssetName(int index) {
+  try {
+    return tarotCards[index].image;
+  } catch (e) {
+    return "";
+  }
 }
 
 List<Tarot> tarotCards = [

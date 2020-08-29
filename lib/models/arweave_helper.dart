@@ -24,6 +24,7 @@ class ArweaveHelper {
       wallet,
     );
     arTransaction.addTag("test-tag-1", "test-value-1");
+    arTransaction.addTag("test-tag", "little-tarot");
     await arTransaction.sign(wallet);
     await arweave.transactions.post(arTransaction);
     print("done");
@@ -33,6 +34,42 @@ class ArweaveHelper {
   }
 
   static Future<List<TarotInfo>> fetchTarotInfoBoard() async {
-    return null;
+    //fixme:
+    return [
+      TarotInfo(
+        index: 0,
+        question: "Who is the fool 1?",
+        note: "The Fool.",
+        reverse: false,
+        datetime: "Aug 30, 2020",
+      ),
+      TarotInfo(
+        index: 0,
+        question: "Who is the fool 2?",
+        note: "The Fool 2.",
+        reverse: false,
+        datetime: "Aug 30, 2020",
+      ),
+      TarotInfo(
+        index: 2,
+        question: "Who is the fool 4?",
+        note: "The Fool 3.",
+        reverse: true,
+        datetime: "Aug 29, 2020",
+      ),
+      TarotInfo(
+        index: 10,
+        question: "Who is the fool 3?",
+        note: "The Fool 7.",
+        datetime: "Aug 33, 2020",
+      ),
+      TarotInfo(
+        index: 60,
+        question: "Who is the fool?",
+        note: "The Fool 6.",
+        reverse: true,
+        datetime: "Aug 32, 2020",
+      ),
+    ];
   }
 }
