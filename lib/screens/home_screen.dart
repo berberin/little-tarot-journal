@@ -3,13 +3,13 @@ import 'dart:math';
 import 'dart:typed_data';
 
 import 'package:arweave/arweave.dart';
-import 'package:arweave/utils.dart';
 import 'package:dotted_border/dotted_border.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dropzone/flutter_dropzone.dart';
 import 'package:flutter_html/flutter_html.dart';
 import 'package:intl/intl.dart';
 import 'package:little_tarot_journal/components/tarot_container.dart';
+import 'package:little_tarot_journal/models/arweave_helper.dart';
 import 'package:little_tarot_journal/models/authenticator.dart';
 import 'package:little_tarot_journal/models/tarots.dart';
 
@@ -352,7 +352,7 @@ class _HomeScreenState extends State<HomeScreen> {
             dynamic ev = await controller.pickFiles(multiple: false);
             Uint8List data = await controller.getFileData(ev[0]);
             logged = await Authenticator.login(data);
-            balance = await client.wallets.getBalance(Authenticator.address);
+            //balance = await client.wallets.getBalance(Authenticator.address);
             setState(() {});
           },
         ),
@@ -364,8 +364,8 @@ class _HomeScreenState extends State<HomeScreen> {
     return Container(
       child: Column(
         children: [
-          Text(Authenticator.address),
-          Text(winstonToAr(BigInt.parse(balance))),
+          //Text(Authenticator.address),
+          //Text(winstonToAr(BigInt.parse(balance))),
         ],
       ),
     );
@@ -457,5 +457,6 @@ class _HomeScreenState extends State<HomeScreen> {
     String journal = currentTarotInfo.toJson();
     Uint8List journalEncryted = Authenticator.encrypt(utf8.encode(journal));
     // send journal to Arweave
+    await ArweaveHelper.submitData(journalEncryted);
   }
 }
