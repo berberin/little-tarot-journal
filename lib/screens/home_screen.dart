@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_dropzone/flutter_dropzone.dart';
 import 'package:flutter_html/flutter_html.dart';
 import 'package:intl/intl.dart';
+import 'package:little_tarot_journal/components/misc.dart';
 import 'package:little_tarot_journal/components/tarot_container.dart';
 import 'package:little_tarot_journal/components/tarot_on_board.dart';
 import 'package:little_tarot_journal/models/arweave_helper.dart';
@@ -33,6 +34,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   bool logged;
   bool enableEdit;
+  bool saved = false;
   DropzoneViewController controller;
 
   TextEditingController questionController;
@@ -232,13 +234,19 @@ class _HomeScreenState extends State<HomeScreen> {
                               ),
                               enableEdit
                                   ? raisedButton(
-                                      title: "SAVE YOUR JOURNAL",
-                                      color: pastelGreen,
+                                      title: saved ? "SAVED" : "SAVE YOUR JOURNAL",
+                                      color: saved ? Colors.grey : pastelGreen,
                                       fontSize: 20,
                                       fontWeight: FontWeight.w600,
-                                      onPressed: () async {
-                                        await _saveYourJournal();
-                                      },
+                                      onPressed: saved
+                                          ? null
+                                          : () async {
+                                              showLoadingDialog(context);
+                                              await _saveYourJournal();
+                                              saved = true;
+                                              Navigator.pop(context);
+                                              setState(() {});
+                                            },
                                     )
                                   : Container(),
                               SizedBox(
@@ -258,8 +266,9 @@ class _HomeScreenState extends State<HomeScreen> {
                                     index = null;
                                     reverse = null;
                                     currentTarotInfo = TarotInfo();
-                                    question = null;
-                                    note = null;
+                                    question = "";
+                                    noteController.clear();
+                                    saved = false;
                                   });
                                 },
                               ),
@@ -285,17 +294,13 @@ class _HomeScreenState extends State<HomeScreen> {
       int millis = random.nextInt(200);
       await Future.delayed(Duration(milliseconds: millis));
     }
-    index = 3;
-    reverse = false;
-
     currentTarotInfo = TarotInfo(
       index: index,
       reverse: reverse,
       question: question,
       datetime: DateFormat.yMMMd().format(DateTime.now()),
     );
-    print(index);
-    print(reverse);
+    setState(() {});
   }
 
   _setCurrentInfoCard(TarotInfo tarotInfo) {
@@ -361,12 +366,10 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Widget _futureBuilderHistoryCard() {
-    print("future");
     return FutureBuilder(
       future: historyCards,
       builder: (context, cardsSnap) {
         if (cardsSnap.hasData) {
-          print(cardsSnap.data);
           return cardsSnap.data.length != 0
               ? Padding(
                   padding: const EdgeInsets.only(
@@ -472,10 +475,10 @@ class _HomeScreenState extends State<HomeScreen> {
                 fontSize: 20,
                 fontWeight: FontWeight.w600,
                 color: pastelBlue,
-                onPressed: () {
+                onPressed: () async {
                   enableEdit = true;
                   question = questionController.text;
-                  _drawCard();
+                  await _drawCard();
                 },
               ),
             ],

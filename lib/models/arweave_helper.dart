@@ -1,6 +1,8 @@
 import 'dart:typed_data';
 
 import 'package:arweave/arweave.dart';
+import 'package:arweave/utils.dart';
+import 'package:little_tarot_journal/models/authenticator.dart';
 import 'package:little_tarot_journal/models/tarots.dart';
 
 class ArweaveHelper {
@@ -16,24 +18,36 @@ class ArweaveHelper {
     Transaction transaction = Transaction(
       data: String.fromCharCodes(data),
     );
-    print(wallet.address);
     var arTransaction = await arweave.createTransaction(
       Transaction(
         data: String.fromCharCodes(data),
       ),
       wallet,
     );
-    arTransaction.addTag("test-tag-1", "test-value-1");
-    arTransaction.addTag("test-tag", "little-tarot");
+    arTransaction.addTag("app", "little_tarot_journal");
     await arTransaction.sign(wallet);
     await arweave.transactions.post(arTransaction);
-    print("done");
-    print("arTransaction id: ");
-    print(arTransaction.id);
-    print(await arweave.wallets.getLastTransactionId(address));
   }
 
   static Future<List<TarotInfo>> fetchTarotInfoBoard() async {
+    Map<String, dynamic> query = {
+      "op": "equals",
+      "expr1": "app",
+      "expr2": "little_tarot_journal",
+    };
+    List<String> result = await arweave.arql(query);
+    print(result);
+    List<TarotInfo> tarots = List<TarotInfo>();
+    String data = await arweave.transactions.getData(result[2]);
+    for (var id in result) {
+      Uint8List data = decodeBase64ToBytes(await arweave.transactions.getData(id));
+      print(String.fromCharCodes(data));
+      var trans = await arweave.transactions.get(id);
+
+      Uint8List dataDecrypted = Authenticator.decrypt(data);
+      print(String.fromCharCodes(dataDecrypted));
+    }
+    print(data);
     //fixme:
     return [
       TarotInfo(

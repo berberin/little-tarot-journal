@@ -10,7 +10,6 @@ class TarotOnBoard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    print("build tarot board");
     return InkWell(
       onTap: () => onTap(),
       child: Container(
