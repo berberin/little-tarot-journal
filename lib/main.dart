@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:little_tarot_journal/models/arweave_helper.dart';
 import 'package:little_tarot_journal/screens/home_screen.dart';
 
 void main() {
+  ArweaveHelper.init();
   runApp(MyApp());
 }
 
