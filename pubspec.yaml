@@ -38,6 +38,8 @@ dependencies:
       url: https://github.com/CDDelta/arweave-dart.git
       ref: 097348bbb5c08547333b86944f05f5b071c68987
   flutter_spinkit: ^4.1.2+1
+  #pointycastle v2
+  steel_crypt: ^2.2.2+1
 
 dependency_overrides:
   # using pointycastle at this pull request to avoid issue with dart2js | https://github.com/bcgit/pc-dart/pull/41

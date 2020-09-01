@@ -1,9 +1,11 @@
+import 'dart:convert';
 import 'dart:typed_data';
 
 import 'package:arweave/arweave.dart';
 import 'package:arweave/utils.dart';
 import 'package:little_tarot_journal/models/authenticator.dart';
 import 'package:little_tarot_journal/models/tarots.dart';
+import 'package:steel_crypt/steel_crypt.dart';
 
 class ArweaveHelper {
   static Arweave arweave;
@@ -15,75 +17,66 @@ class ArweaveHelper {
   }
 
   static submitData(Uint8List data) async {
-    Transaction transaction = Transaction(
-      data: String.fromCharCodes(data),
-    );
+    Map<String, String> jsonMap = Map<String, String>();
+    String aesKey = CryptKey().genDart();
+    String aesKeyEncrypted =
+        String.fromCharCodes(Authenticator.rsaEncrypt(utf8.encode(aesKey)));
+    jsonMap['k'] = aesKeyEncrypted;
+
+    String dataEncrypted = String.fromCharCodes(
+        Authenticator.aesEncrypt(utf8.encode(aesKey), data));
+    jsonMap['d'] = dataEncrypted;
+
     var arTransaction = await arweave.createTransaction(
       Transaction(
-        data: String.fromCharCodes(data),
+        data: json.encode(jsonMap),
       ),
       wallet,
     );
-    arTransaction.addTag("app", "little_tarot_journal");
+    arTransaction.addTag("app", "little_tarot_journal_v2");
     await arTransaction.sign(wallet);
     await arweave.transactions.post(arTransaction);
   }
 
   static Future<List<TarotInfo>> fetchTarotInfoBoard() async {
     Map<String, dynamic> query = {
-      "op": "equals",
-      "expr1": "app",
-      "expr2": "little_tarot_journal",
+      "op": "and",
+      "expr1": {
+        "op": "equals",
+        "expr1": "app",
+        "expr2": "little_tarot_journal_v2",
+      },
+      "expr2": {
+        "op": "equals",
+        "expr1": "from",
+        "expr2": address,
+      }
     };
     List<String> result = await arweave.arql(query);
     print(result);
-    List<TarotInfo> tarots = List<TarotInfo>();
-    String data = await arweave.transactions.getData(result[2]);
-    for (var id in result) {
-      Uint8List data = decodeBase64ToBytes(await arweave.transactions.getData(id));
-      print(String.fromCharCodes(data));
-      var trans = await arweave.transactions.get(id);
 
-      Uint8List dataDecrypted = Authenticator.decrypt(data);
-      print(String.fromCharCodes(dataDecrypted));
+    List<TarotInfo> tarots = List<TarotInfo>();
+
+    for (var id in result) {
+      String data =
+          decodeBase64ToString(await arweave.transactions.getData(id));
+      try {
+        Map<String, String> jsonMap = json.decode(data);
+        String aesKeyEncrypted = jsonMap['k'];
+        String dataEncrypted = jsonMap['d'];
+
+        Uint8List aesKey =
+            Authenticator.rsaDecrypt(utf8.encode(aesKeyEncrypted));
+        String dataDecrypted = utf8.decode(
+            Authenticator.aesDecrypt(aesKey, utf8.encode(dataEncrypted)));
+        TarotInfo temp = TarotInfo.fromJson(json.decode(dataDecrypted));
+        tarots.add(temp);
+      } catch (e) {
+        print(e);
+        continue;
+      }
     }
-    print(data);
-    //fixme:
-    return [
-      TarotInfo(
-        index: 0,
-        question: "Who is the fool 1?",
-        note: "The Fool.",
-        reverse: false,
-        datetime: "Aug 30, 2020",
-      ),
-      TarotInfo(
-        index: 0,
-        question: "Who is the fool 2?",
-        note: "The Fool 2.",
-        reverse: false,
-        datetime: "Aug 30, 2020",
-      ),
-      TarotInfo(
-        index: 2,
-        question: "Who is the fool 4?",
-        note: "The Fool 3.",
-        reverse: true,
-        datetime: "Aug 29, 2020",
-      ),
-      TarotInfo(
-        index: 10,
-        question: "Who is the fool 3?",
-        note: "The Fool 7.",
-        datetime: "Aug 33, 2020",
-      ),
-      TarotInfo(
-        index: 60,
-        question: "Who is the fool?",
-        note: "The Fool 6.",
-        reverse: true,
-        datetime: "Aug 32, 2020",
-      ),
-    ];
+    print("returned");
+    return tarots;
   }
 }

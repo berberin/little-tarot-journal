@@ -117,12 +117,14 @@ class _HomeScreenState extends State<HomeScreen> {
                                           width: 3.0,
                                           color: pastelBlue,
                                         ),
-                                        borderRadius: BorderRadius.all(Radius.circular(10.0)),
+                                        borderRadius: BorderRadius.all(
+                                            Radius.circular(10.0)),
                                         color: whitey,
                                       ),
                                       child: Text(
                                         reverse
-                                            ? tarotCards[index].name + " Reversed"
+                                            ? tarotCards[index].name +
+                                                " Reversed"
                                             : tarotCards[index].name,
                                         style: TextStyle(
                                           fontSize: 30,
@@ -160,11 +162,15 @@ class _HomeScreenState extends State<HomeScreen> {
                                   : Container(
                                       child: Column(
                                         mainAxisSize: MainAxisSize.min,
-                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
                                         children: [
                                           Text(
                                             "Your question",
-                                            style: Theme.of(context).textTheme.headline5.copyWith(
+                                            style: Theme.of(context)
+                                                .textTheme
+                                                .headline5
+                                                .copyWith(
                                                   color: vertEmpire,
                                                 ),
                                           ),
@@ -172,7 +178,9 @@ class _HomeScreenState extends State<HomeScreen> {
                                             direction: Axis.horizontal,
                                             children: [
                                               Text(
-                                                enableEdit ? question : currentTarotInfo.question,
+                                                enableEdit
+                                                    ? question
+                                                    : currentTarotInfo.question,
                                                 style: TextStyle(
                                                   color: vertEmpire,
                                                 ),
@@ -189,7 +197,10 @@ class _HomeScreenState extends State<HomeScreen> {
                                 alignment: Alignment.centerLeft,
                                 child: Text(
                                   "Date",
-                                  style: Theme.of(context).textTheme.headline5.copyWith(
+                                  style: Theme.of(context)
+                                      .textTheme
+                                      .headline5
+                                      .copyWith(
                                         color: vertEmpire,
                                       ),
                                 ),
@@ -199,7 +210,8 @@ class _HomeScreenState extends State<HomeScreen> {
                                 children: [
                                   Text(
                                     enableEdit
-                                        ? DateFormat.yMMMd().format(DateTime.now())
+                                        ? DateFormat.yMMMd()
+                                            .format(DateTime.now())
                                         : currentTarotInfo.datetime,
                                     style: TextStyle(
                                       color: vertEmpire,
@@ -234,7 +246,8 @@ class _HomeScreenState extends State<HomeScreen> {
                               ),
                               enableEdit
                                   ? raisedButton(
-                                      title: saved ? "SAVED" : "SAVE YOUR JOURNAL",
+                                      title:
+                                          saved ? "SAVED" : "SAVE YOUR JOURNAL",
                                       color: saved ? Colors.grey : pastelGreen,
                                       fontSize: 20,
                                       fontWeight: FontWeight.w600,
@@ -489,7 +502,11 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   RaisedButton raisedButton(
-      {String title, double fontSize, FontWeight fontWeight, Function onPressed, Color color}) {
+      {String title,
+      double fontSize,
+      FontWeight fontWeight,
+      Function onPressed,
+      Color color}) {
     return RaisedButton(
       child: Container(
         padding: EdgeInsets.all(10),
@@ -511,8 +528,7 @@ class _HomeScreenState extends State<HomeScreen> {
   _saveYourJournal() async {
     currentTarotInfo.note = noteController.text;
     String journal = currentTarotInfo.toJson();
-    Uint8List journalEncryted = Authenticator.encrypt(utf8.encode(journal));
     // send journal to Arweave
-    await ArweaveHelper.submitData(journalEncryted);
+    await ArweaveHelper.submitData(utf8.encode(journal));
   }
 }

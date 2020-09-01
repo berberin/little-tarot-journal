@@ -30,35 +30,52 @@ class Authenticator {
     return logged;
   }
 
-  static Uint8List encrypt(Uint8List data) {
+  static Uint8List rsaEncrypt(Uint8List data) {
     final encryptor = OAEPEncoding(RSAEngine())
-      ..init(true, PublicKeyParameter<RSAPublicKey>(_publicKey)); // true=encrypt
+      ..init(
+          true, PublicKeyParameter<RSAPublicKey>(_publicKey)); // true=encrypt
 
     return _processInBlocks(encryptor, data);
   }
 
-  static Uint8List decrypt(Uint8List data) {
+  static Uint8List rsaDecrypt(Uint8List data) {
     final decryptor = OAEPEncoding(RSAEngine())
-      ..init(false, PrivateKeyParameter<RSAPrivateKey>(_privateKey)); // false=decrypt
+      ..init(false,
+          PrivateKeyParameter<RSAPrivateKey>(_privateKey)); // false=decrypt
 
     return _processInBlocks(decryptor, data);
   }
 
-  Uint8List rsaEncrypt(RSAPublicKey myPublic, Uint8List dataToEncrypt) {
-    final encryptor = OAEPEncoding(RSAEngine())
-      ..init(true, PublicKeyParameter<RSAPublicKey>(myPublic)); // true=encrypt
+  static Uint8List aesEncrypt(Uint8List key, Uint8List plaintext) {
+    final ecb = ECBBlockCipher(AESFastEngine())
+      ..init(true, KeyParameter(key)); // true=encrypt
 
-    return _processInBlocks(encryptor, dataToEncrypt);
+    // Encrypt the plaintext block-by-block
+    final cipherText = Uint8List(plaintext.length);
+    var offset = 0;
+    while (offset < plaintext.length) {
+      offset += ecb.processBlock(plaintext, offset, cipherText, offset);
+    }
+    assert(offset == plaintext.length);
+
+    return cipherText;
   }
 
-  Uint8List rsaDecrypt(RSAPrivateKey myPrivate, Uint8List cipherText) {
-    final decryptor = OAEPEncoding(RSAEngine())
-      ..init(false, PrivateKeyParameter<RSAPrivateKey>(myPrivate)); // false=decrypt
+  static Uint8List aesDecrypt(Uint8List key, Uint8List cipherText) {
+    final ecb = ECBBlockCipher(AESFastEngine())
+      ..init(false, KeyParameter(key)); // false=decrypt
 
-    return _processInBlocks(decryptor, cipherText);
+    // Decrypt the cipherText block-by-block
+    final plaintext = Uint8List(cipherText.length);
+    var offset = 0;
+    while (offset < cipherText.length) {
+      offset += ecb.processBlock(cipherText, offset, plaintext, offset);
+    }
+    return plaintext;
   }
 
-  static Uint8List _processInBlocks(AsymmetricBlockCipher engine, Uint8List input) {
+  static Uint8List _processInBlocks(
+      AsymmetricBlockCipher engine, Uint8List input) {
     final numBlocks = input.length ~/ engine.inputBlockSize +
         ((input.length % engine.inputBlockSize != 0) ? 1 : 0);
 
@@ -71,11 +88,14 @@ class Authenticator {
           ? engine.inputBlockSize
           : input.length - inputOffset;
 
-      outputOffset += engine.processBlock(input, inputOffset, chunkSize, output, outputOffset);
+      outputOffset += engine.processBlock(
+          input, inputOffset, chunkSize, output, outputOffset);
 
       inputOffset += chunkSize;
     }
 
-    return (output.length == outputOffset) ? output : output.sublist(0, outputOffset);
+    return (output.length == outputOffset)
+        ? output
+        : output.sublist(0, outputOffset);
   }
 }
