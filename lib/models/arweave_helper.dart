@@ -16,24 +16,28 @@ class ArweaveHelper {
     arweave = Arweave();
   }
 
-  static submitData(Uint8List data) async {
+  static submitData(String data) async {
     Map<String, String> jsonMap = Map<String, String>();
     String aesKey = CryptKey().genDart();
+    String iv = CryptKey().genDart();
     String aesKeyEncrypted =
-        String.fromCharCodes(Authenticator.rsaEncrypt(utf8.encode(aesKey)));
+        encodeBytesToBase64(Authenticator.rsaEncrypt((utf8.encode(aesKey))));
     jsonMap['k'] = aesKeyEncrypted;
+    jsonMap['i'] = iv;
 
-    String dataEncrypted = String.fromCharCodes(
-        Authenticator.aesEncrypt(utf8.encode(aesKey), data));
-    jsonMap['d'] = dataEncrypted;
+    String dataEncrypted = Authenticator.aesEncrypt(aesKey, iv, data);
+    jsonMap['d'] = encodeStringToBase64(dataEncrypted);
+
+    var load = jsonEncode(jsonMap);
+    print(load);
 
     var arTransaction = await arweave.createTransaction(
       Transaction(
-        data: json.encode(jsonMap),
+        data: load,
       ),
       wallet,
     );
-    arTransaction.addTag("app", "little_tarot_journal_v2");
+    arTransaction.addTag("app", "little_tarot_journal_v3");
     await arTransaction.sign(wallet);
     await arweave.transactions.post(arTransaction);
   }
@@ -44,7 +48,7 @@ class ArweaveHelper {
       "expr1": {
         "op": "equals",
         "expr1": "app",
-        "expr2": "little_tarot_journal_v2",
+        "expr2": "little_tarot_journal_v3",
       },
       "expr2": {
         "op": "equals",
@@ -57,22 +61,25 @@ class ArweaveHelper {
 
     List<TarotInfo> tarots = List<TarotInfo>();
 
-    for (var id in result) {
+    for (int id = result.length - 1; id >= 0; id--) {
       String data =
-          decodeBase64ToString(await arweave.transactions.getData(id));
+          decodeBase64ToString(await arweave.transactions.getData(result[id]));
+      print(data);
       try {
-        Map<String, String> jsonMap = json.decode(data);
-        String aesKeyEncrypted = jsonMap['k'];
-        String dataEncrypted = jsonMap['d'];
+        Map<String, dynamic> jsonMap = jsonDecode(data);
+        Uint8List aesKeyEncrypted = decodeBase64ToBytes(jsonMap['k']);
+        print(aesKeyEncrypted);
+        String dataEncrypted = decodeBase64ToString(jsonMap['d']);
 
-        Uint8List aesKey =
-            Authenticator.rsaDecrypt(utf8.encode(aesKeyEncrypted));
-        String dataDecrypted = utf8.decode(
-            Authenticator.aesDecrypt(aesKey, utf8.encode(dataEncrypted)));
+        String iv = jsonMap['i'];
+
+        Uint8List aesKey = Authenticator.rsaDecrypt(aesKeyEncrypted);
+        String dataDecrypted = Authenticator.aesDecrypt(
+            String.fromCharCodes(aesKey), iv, dataEncrypted);
+
         TarotInfo temp = TarotInfo.fromJson(json.decode(dataDecrypted));
         tarots.add(temp);
       } catch (e) {
-        print(e);
         continue;
       }
     }

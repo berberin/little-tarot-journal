@@ -5,6 +5,7 @@ import 'package:arweave/arweave.dart';
 import 'package:arweave/utils.dart';
 import 'package:little_tarot_journal/models/arweave_helper.dart';
 import 'package:pointycastle/export.dart';
+import 'package:steel_crypt/steel_crypt.dart';
 
 class Authenticator {
   static bool logged = false;
@@ -46,31 +47,15 @@ class Authenticator {
     return _processInBlocks(decryptor, data);
   }
 
-  static Uint8List aesEncrypt(Uint8List key, Uint8List plaintext) {
-    final ecb = ECBBlockCipher(AESFastEngine())
-      ..init(true, KeyParameter(key)); // true=encrypt
-
-    // Encrypt the plaintext block-by-block
-    final cipherText = Uint8List(plaintext.length);
-    var offset = 0;
-    while (offset < plaintext.length) {
-      offset += ecb.processBlock(plaintext, offset, cipherText, offset);
-    }
-    assert(offset == plaintext.length);
-
-    return cipherText;
+  static String aesEncrypt(String key, String iv, String plaintext) {
+    var aesEncrypter = AesCrypt(key: key, padding: PaddingAES.iso78164);
+    var crypted = aesEncrypter.cbc.encrypt(inp: plaintext, iv: iv);
+    return crypted;
   }
 
-  static Uint8List aesDecrypt(Uint8List key, Uint8List cipherText) {
-    final ecb = ECBBlockCipher(AESFastEngine())
-      ..init(false, KeyParameter(key)); // false=decrypt
-
-    // Decrypt the cipherText block-by-block
-    final plaintext = Uint8List(cipherText.length);
-    var offset = 0;
-    while (offset < cipherText.length) {
-      offset += ecb.processBlock(cipherText, offset, plaintext, offset);
-    }
+  static String aesDecrypt(String key, String iv, String cipherText) {
+    var aesEncrypter = AesCrypt(key: key, padding: PaddingAES.iso78164);
+    var plaintext = aesEncrypter.cbc.decrypt(enc: cipherText, iv: iv);
     return plaintext;
   }
 
