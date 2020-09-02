@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:math';
 import 'dart:typed_data';
 
+import 'package:arweave/utils.dart';
 import 'package:dotted_border/dotted_border.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dropzone/flutter_dropzone.dart';
@@ -13,6 +14,7 @@ import 'package:little_tarot_journal/components/tarot_on_board.dart';
 import 'package:little_tarot_journal/models/arweave_helper.dart';
 import 'package:little_tarot_journal/models/authenticator.dart';
 import 'package:little_tarot_journal/models/tarots.dart';
+import 'package:steel_crypt/steel_crypt.dart';
 
 import '../constants.dart';
 
@@ -69,20 +71,20 @@ class _HomeScreenState extends State<HomeScreen> {
         (index != null && reverse != null)
             ? Expanded(
                 flex: 4,
-                child: Row(
-                  children: [
-                    Expanded(
-                      flex: 1,
-                      child: Container(
-                        color: whitey,
-                        padding: EdgeInsets.only(
-                          left: 30,
-                          right: 5,
-                          top: 10,
-                          bottom: 10,
-                        ),
-                        child: SingleChildScrollView(
-                          physics: BouncingScrollPhysics(),
+                child: SingleChildScrollView(
+                  physics: BouncingScrollPhysics(),
+                  child: Row(
+                    children: [
+                      Expanded(
+                        flex: 1,
+                        child: Container(
+                          color: whitey,
+                          padding: EdgeInsets.only(
+                            left: 30,
+                            right: 5,
+                            top: 10,
+                            bottom: 10,
+                          ),
                           child: Column(
                             mainAxisAlignment: MainAxisAlignment.center,
                             mainAxisSize: MainAxisSize.max,
@@ -98,14 +100,11 @@ class _HomeScreenState extends State<HomeScreen> {
                           ),
                         ),
                       ),
-                    ),
-                    Expanded(
-                      flex: 1,
-                      child: currentTarotInfo != null
-                          ? Container(
-                              color: whitey,
-                              child: SingleChildScrollView(
-                                physics: BouncingScrollPhysics(),
+                      Expanded(
+                        flex: 1,
+                        child: currentTarotInfo != null
+                            ? Container(
+                                color: whitey,
                                 child: Column(
                                   mainAxisSize: MainAxisSize.max,
                                   mainAxisAlignment: MainAxisAlignment.center,
@@ -139,158 +138,166 @@ class _HomeScreenState extends State<HomeScreen> {
                                     ),
                                   ],
                                 ),
-                              ),
-                            )
-                          : Container(),
-                    ),
-                    Expanded(
-                      flex: 1,
-                      child: Container(
-                        color: whitey,
-                        padding: EdgeInsets.only(
-                          left: 5,
-                          right: 30,
-                          top: 10,
-                          bottom: 10,
-                        ),
-                        child: SingleChildScrollView(
-                          physics: BouncingScrollPhysics(),
-                          child: Column(
-                            children: [
-                              (question == "" || question == null)
-                                  ? Container()
-                                  : Container(
-                                      child: Column(
-                                        mainAxisSize: MainAxisSize.min,
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children: [
-                                          Text(
-                                            "Your question",
-                                            style: Theme.of(context)
-                                                .textTheme
-                                                .headline5
-                                                .copyWith(
-                                                  color: vertEmpire,
+                              )
+                            : Container(),
+                      ),
+                      Expanded(
+                        flex: 1,
+                        child: Container(
+                          color: whitey,
+                          padding: EdgeInsets.only(
+                            left: 5,
+                            right: 30,
+                            top: 10,
+                            bottom: 10,
+                          ),
+                          child: SingleChildScrollView(
+                            physics: BouncingScrollPhysics(),
+                            child: Column(
+                              children: [
+                                (question == "" || question == null)
+                                    ? Container()
+                                    : Container(
+                                        child: Column(
+                                          mainAxisSize: MainAxisSize.min,
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            Text(
+                                              "Your question",
+                                              style: Theme.of(context)
+                                                  .textTheme
+                                                  .headline5
+                                                  .copyWith(
+                                                    color: vertEmpire,
+                                                  ),
+                                            ),
+                                            Flex(
+                                              direction: Axis.horizontal,
+                                              children: [
+                                                Text(
+                                                  enableEdit
+                                                      ? question
+                                                      : currentTarotInfo
+                                                          .question,
+                                                  style: TextStyle(
+                                                    color: vertEmpire,
+                                                  ),
                                                 ),
-                                          ),
-                                          Flex(
-                                            direction: Axis.horizontal,
-                                            children: [
-                                              Text(
-                                                enableEdit
-                                                    ? question
-                                                    : currentTarotInfo.question,
-                                                style: TextStyle(
-                                                  color: vertEmpire,
-                                                ),
-                                              ),
-                                            ],
-                                          ),
-                                          SizedBox(
-                                            height: 20,
-                                          ),
-                                        ],
+                                              ],
+                                            ),
+                                            SizedBox(
+                                              height: 20,
+                                            ),
+                                          ],
+                                        ),
                                       ),
-                                    ),
-                              Align(
-                                alignment: Alignment.centerLeft,
-                                child: Text(
-                                  "Date",
-                                  style: Theme.of(context)
-                                      .textTheme
-                                      .headline5
-                                      .copyWith(
+                                Align(
+                                  alignment: Alignment.centerLeft,
+                                  child: Text(
+                                    "Date",
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .headline5
+                                        .copyWith(
+                                          color: vertEmpire,
+                                        ),
+                                  ),
+                                ),
+                                Flex(
+                                  direction: Axis.horizontal,
+                                  children: [
+                                    Text(
+                                      enableEdit
+                                          ? DateFormat.yMMMd()
+                                              .format(DateTime.now())
+                                          : currentTarotInfo.datetime,
+                                      style: TextStyle(
                                         color: vertEmpire,
                                       ),
-                                ),
-                              ),
-                              Flex(
-                                direction: Axis.horizontal,
-                                children: [
-                                  Text(
-                                    enableEdit
-                                        ? DateFormat.yMMMd()
-                                            .format(DateTime.now())
-                                        : currentTarotInfo.datetime,
-                                    style: TextStyle(
-                                      color: vertEmpire,
                                     ),
-                                  ),
-                                ],
-                              ),
-                              SizedBox(
-                                height: 20,
-                              ),
-                              Container(
-                                margin: EdgeInsets.all(10),
-                                padding: EdgeInsets.only(
-                                  bottom: 40,
+                                  ],
                                 ),
-                                child: TextFormField(
-                                  maxLines: 8,
-                                  decoration: InputDecoration(
-                                    hintText: "Your note about this reading",
-                                    labelText: "Note",
-                                    border: OutlineInputBorder(
-                                      borderRadius: BorderRadius.circular(17),
-                                    ),
+                                SizedBox(
+                                  height: 20,
+                                ),
+                                Container(
+                                  margin: EdgeInsets.all(10),
+                                  padding: EdgeInsets.only(
+                                    bottom: 40,
                                   ),
-                                  readOnly: !enableEdit,
+                                  child: TextFormField(
+                                    maxLines: 8,
+                                    decoration: InputDecoration(
+                                      hintText: "Your note about this reading",
+                                      labelText: "Note",
+                                      border: OutlineInputBorder(
+                                        borderRadius: BorderRadius.circular(17),
+                                      ),
+                                    ),
+                                    readOnly: !enableEdit,
 //                                  focusNode: FocusNode(),
 //                                  enableInteractiveSelection: false,
-                                  //initialValue: enableEdit ? null : currentTarotInfo.note,
-                                  controller: noteController,
-                                  textAlign: TextAlign.justify,
+                                    //initialValue: enableEdit ? null : currentTarotInfo.note,
+                                    controller: noteController,
+                                    textAlign: TextAlign.justify,
+                                  ),
                                 ),
-                              ),
-                              enableEdit
-                                  ? raisedButton(
-                                      title:
-                                          saved ? "SAVED" : "SAVE YOUR JOURNAL",
-                                      color: saved ? Colors.grey : pastelGreen,
-                                      fontSize: 20,
-                                      fontWeight: FontWeight.w600,
-                                      onPressed: saved
-                                          ? null
-                                          : () async {
-                                              showLoadingDialog(context);
-                                              await _saveYourJournal();
-                                              saved = true;
-                                              Navigator.pop(context);
-                                              setState(() {});
-                                            },
-                                    )
-                                  : Container(),
-                              SizedBox(
-                                height: 10,
-                              ),
-                              Text("Your journal will be stored securely."),
-                              SizedBox(
-                                height: 20,
-                              ),
-                              raisedButton(
-                                title: "DRAW A NEW CARD",
-                                color: pastelOrange,
-                                fontSize: 20,
-                                fontWeight: FontWeight.w600,
-                                onPressed: () {
-                                  setState(() {
-                                    index = null;
-                                    reverse = null;
-                                    currentTarotInfo = TarotInfo();
-                                    question = "";
-                                    noteController.clear();
-                                    saved = false;
-                                  });
-                                },
-                              ),
-                            ],
+                                enableEdit
+                                    ? raisedButton(
+                                        title: !logged
+                                            ? "Need to login"
+                                            : saved
+                                                ? "SAVED"
+                                                : "SAVE YOUR JOURNAL",
+                                        color: !logged
+                                            ? Colors.grey
+                                            : saved ? Colors.grey : pastelGreen,
+                                        fontSize: 20,
+                                        fontWeight: FontWeight.w600,
+                                        onPressed: !logged
+                                            ? null
+                                            : saved
+                                                ? null
+                                                : () async {
+                                                    showLoadingDialog(context);
+                                                    await _saveYourJournal();
+                                                    saved = true;
+                                                    Navigator.pop(context);
+                                                    setState(() {});
+                                                  },
+                                      )
+                                    : Container(),
+                                SizedBox(
+                                  height: 10,
+                                ),
+                                Text("Your journal will be stored securely."),
+                                SizedBox(
+                                  height: 20,
+                                ),
+                                raisedButton(
+                                  title: "DRAW A NEW CARD",
+                                  color: pastelOrange,
+                                  fontSize: 20,
+                                  fontWeight: FontWeight.w600,
+                                  onPressed: () {
+                                    setState(() {
+                                      index = null;
+                                      reverse = null;
+                                      currentTarotInfo = TarotInfo();
+                                      question = "";
+                                      noteController.clear();
+                                      saved = false;
+                                    });
+                                  },
+                                ),
+                              ],
+                            ),
                           ),
                         ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               )
             : _startDrawCardWidget(),
@@ -330,14 +337,19 @@ class _HomeScreenState extends State<HomeScreen> {
 
   Widget _dropzone() {
     return Container(
-      height: 250,
+      height: 170,
       child: Stack(
         children: [
           DropzoneView(
             operation: DragOperation.copy,
             cursor: CursorType.grab,
             onCreated: (ctrl) => controller = ctrl,
-            onDrop: (ev) async => print(await controller.getFileData(ev)),
+            onDrop: (ev) async {
+              Uint8List data = await controller.getFileData(ev);
+              logged = await Authenticator.login(data);
+              historyCards = ArweaveHelper.fetchTarotInfoBoard();
+              setState(() {});
+            },
           ),
           InkWell(
             child: Container(
@@ -355,7 +367,8 @@ class _HomeScreenState extends State<HomeScreen> {
                         Text(
                           dropUsage,
                           style: TextStyle(
-                            fontSize: 30,
+                            fontSize: 20,
+                            color: vertEmpire,
                           ),
                           textAlign: TextAlign.center,
                         ),
@@ -397,11 +410,11 @@ class _HomeScreenState extends State<HomeScreen> {
                       Text(
                         "Review your history:",
                         style: TextStyle(
-                          fontSize: 30,
+                          fontSize: 25,
                         ),
                       ),
                       SizedBox(
-                        height: 300,
+                        height: 260,
                         child: ListView.builder(
                           physics: BouncingScrollPhysics(),
                           itemCount: cardsSnap.data.length,
@@ -521,6 +534,7 @@ class _HomeScreenState extends State<HomeScreen> {
         ),
       ),
       color: color,
+      disabledColor: Colors.grey,
       onPressed: () => onPressed(),
     );
   }
@@ -529,6 +543,6 @@ class _HomeScreenState extends State<HomeScreen> {
     currentTarotInfo.note = noteController.text;
     String journal = currentTarotInfo.toJson();
     // send journal to Arweave
-    await ArweaveHelper.submitData(utf8.encode(journal));
+    await ArweaveHelper.submitData(journal);
   }
 }

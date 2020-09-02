@@ -9,5 +9,5 @@ const pastelPurple = Color(0xff9dabdd);
 
 const vertEmpire = Color(0xff405d3f);
 
-const String dropUsage = "Drop Arweave keyfile here to login ...\nYou will need some Wintons.";
-const String getARUsage = "You don't have any Wintons?";
+const String dropUsage =
+    "You need to login before saving your cards.\nClick or drop Arweave key file here ...";

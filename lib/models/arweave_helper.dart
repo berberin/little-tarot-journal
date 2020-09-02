@@ -29,7 +29,6 @@ class ArweaveHelper {
     jsonMap['d'] = encodeStringToBase64(dataEncrypted);
 
     var load = jsonEncode(jsonMap);
-    print(load);
 
     var arTransaction = await arweave.createTransaction(
       Transaction(
@@ -64,11 +63,9 @@ class ArweaveHelper {
     for (int id = result.length - 1; id >= 0; id--) {
       String data =
           decodeBase64ToString(await arweave.transactions.getData(result[id]));
-      print(data);
       try {
         Map<String, dynamic> jsonMap = jsonDecode(data);
         Uint8List aesKeyEncrypted = decodeBase64ToBytes(jsonMap['k']);
-        print(aesKeyEncrypted);
         String dataEncrypted = decodeBase64ToString(jsonMap['d']);
 
         String iv = jsonMap['i'];
