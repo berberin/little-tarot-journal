@@ -1,8 +1,7 @@
 Little Tarot Journal
 ====================
 
-A tarot reading app. Users can draw tarot cards, take notes and questions, all of
-this journal will be encrypted and stored securely on Arweave's network.
+A tarot reading app. Users can draw tarot cards, take notes and questions, all of this journal will be encrypted and stored securely on Arweave's network.
 
 On Permaweb: [Little Tarot Journal](https://arweave.net/UoZ7W6EqXR3vS24h3YyCfy0I30-PXLXtsXaOWoY7blE)
 
@@ -14,7 +13,7 @@ Arweave’s network.
 
 Note: arweave-dart depend on pointycastle v2 from git, so it may not fully compatible with some libs depend on pointycastle v1 from hosted (eg. jose, crypto_key, ...).
 
-A few resources to get you started: 
+A few resources: 
 
 - [Web support for Flutter](https://flutter.dev/web)
 
